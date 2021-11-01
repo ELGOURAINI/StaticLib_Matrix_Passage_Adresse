@@ -26,16 +26,6 @@ algebre::Matrice::Matrice(int lg, int col)
     }
 }
 
-algebre::Matrice::Matrice(const Matrice* M)
-{
-    for (int i = 0; i < this->nbre_lgn; i++)
-    {
-        for (int j = 0; j < this->nbre_col; j++)
-        {
-            this->tab[i][j] = M->tab[i][j];
-        }
-    }
-}
 
 void algebre::Matrice::remplissage(int val)
 {
@@ -62,46 +52,33 @@ void algebre::Matrice::remplir()
     cout << endl;
 }
 
-Matrice* algebre::Matrice::operator=(const Matrice* M)
-{
-    assert(M->nbre_lgn == this->nbre_lgn && M->nbre_col == this->nbre_col);
-    for (int i = 0; i < this->nbre_lgn; i++)
-    {
-        for (int j = 0; j < this->nbre_col; j++)
-        {
-            this->tab[i][j] = M->tab[i][j];
-        }
-    }
-    return this;
-}
 
-
-Matrice* algebre::Matrice::operator+(const Matrice* M)
+Matrice* algebre::Matrice::operator+(const Matrice& M)
 {
     Matrice* M1 = new Matrice(this->nbre_lgn, this->nbre_col);
-    assert(M->nbre_lgn == this->nbre_lgn && M->nbre_col == this->nbre_col);
+    assert(M.nbre_lgn == this->nbre_lgn && M.nbre_col == this->nbre_col);
     for (int i = 0; i < this->nbre_lgn; i++)
     {
         for (int j = 0; j < this->nbre_col; j++)
         {
             //cout << M.tab[i][j] << endl;
-            M1->tab[i][j] = this->tab[i][j] + M->tab[i][j];
+            M1->tab[i][j] = this->tab[i][j] + M.tab[i][j];
             //cout << M1->tab[i][j] << endl;
         }
     }
     return M1;
 }
 
-Matrice* algebre::Matrice::operator-(const Matrice* M)
+Matrice* algebre::Matrice::operator-(const Matrice& M)
 {
     Matrice* M1 = new Matrice(this->nbre_lgn, this->nbre_col);
-    assert(M->nbre_lgn == this->nbre_lgn && M->nbre_col == this->nbre_col);
+    assert(M.nbre_lgn == this->nbre_lgn && M.nbre_col == this->nbre_col);
     for (int i = 0; i < this->nbre_lgn; i++)
     {
         for (int j = 0; j < this->nbre_col; j++)
         {
             //cout << M.tab[i][j] << endl;
-            M1->tab[i][j] = this->tab[i][j] - M->tab[i][j];
+            M1->tab[i][j] = this->tab[i][j] - M.tab[i][j];
             //cout << M1->tab[i][j] << endl;
         }
     }
@@ -122,18 +99,17 @@ Matrice* algebre::Matrice::operator*(int d)
     return M1;
 }
 
-Matrice* algebre::Matrice::operator*(const Matrice* M)
+Matrice* algebre::Matrice::operator*(const Matrice& M)
 {
     Matrice* M1 = new Matrice(this->nbre_lgn, this->nbre_col);
     int res;
-    assert(M->nbre_lgn == this->nbre_lgn && M->nbre_col == this->nbre_col);
+    assert(M.nbre_lgn == this->nbre_lgn && M.nbre_col == this->nbre_col);
     for (int i = 0; i < this->nbre_lgn; i++)
         for (int j = 0; j < this->nbre_col; j++)
         {
-            res = 0;
+            M1->tab[i][j] = 0;
             for (int k = 0; k < this->nbre_col; k++)
-                res += this->tab[i][k] * M->tab[k][j];
-            M1->tab[i][j] = res;
+                M1->tab[i][j]+= this->tab[i][k] * M.tab[k][j];
         }
     return M1;
 }
@@ -155,14 +131,16 @@ void algebre::Matrice::print() const
 
 algebre::Matrice::~Matrice()
 {
-
-    for (int j = 0; j < this->nbre_col; j++)
+    if (this->tab)
     {
-        delete(tab[j]);
-        this->tab[j] = 0;
+        for (int j = 0; j < this->nbre_col; j++)
+        {
+            delete[] this->tab[j];
+            this->tab[j] = 0;
+        }
+        delete[] tab;
+        tab = 0;
     }
-    delete(tab);
-    tab = 0;
 }
 
 
